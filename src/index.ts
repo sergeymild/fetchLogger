@@ -3,6 +3,9 @@ import fetchToCurl from "fetch-to-curl";
 const originalFetch = fetch
 
 const proxyFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+    if (typeof input === "string") {
+        if (input.startsWith('http://localhost:8081') || input.startsWith('http://localhost:8082')) return originalFetch(input, init)
+    }
     console.log('REQUEST---------------------------->')
     console.log(fetchToCurl({
         url: input.toString(),
