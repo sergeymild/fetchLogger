@@ -1,23 +1,28 @@
 import fetchToCurl from "fetch-to-curl";
 
+type Logger = (message?: any, ...optionalParams: any[]) => void
 const originalFetch = fetch
 
 let isEnabled = true
+let localLogger: Logger = console.log
 export const setEnabled = (enabled: boolean) => isEnabled = enabled
+export const setLogger = (logger: Logger) => {
+    localLogger = logger
+}
 
 const proxyFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     if (!isEnabled) return originalFetch(input, init)
     if (typeof input === "string") {
         if (input.startsWith('http://localhost:8081') || input.startsWith('http://localhost:8082')) return originalFetch(input, init)
     }
-    console.log('REQUEST---------------------------->')
-    console.log(fetchToCurl({
+    localLogger('REQUEST---------------------------->')
+    localLogger(fetchToCurl({
         url: input.toString(),
         body: init?.body,
         method: init?.method,
         headers: init?.headers
     }))
-    console.log(JSON.stringify({
+    localLogger(JSON.stringify({
         url: input,
         method: init?.method,
         headers: init?.headers,
@@ -26,8 +31,8 @@ const proxyFetch = async (input: RequestInfo, init?: RequestInit): Promise<Respo
 
     const response = await originalFetch(input, init)
     const json = await response.json()
-    console.log('RESPONSE----------------------------<')
-    console.log(JSON.stringify({
+    localLogger('RESPONSE----------------------------<')
+    localLogger(JSON.stringify({
         url: input,
         status: response.status,
         data: json,
