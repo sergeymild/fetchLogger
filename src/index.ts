@@ -2,7 +2,11 @@ import fetchToCurl from "fetch-to-curl";
 
 const originalFetch = fetch
 
+let isEnabled = true
+export const setEnabled = (enabled: boolean) => isEnabled = enabled
+
 const proxyFetch = async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
+    if (!isEnabled) return originalFetch(input, init)
     if (typeof input === "string") {
         if (input.startsWith('http://localhost:8081') || input.startsWith('http://localhost:8082')) return originalFetch(input, init)
     }
@@ -33,5 +37,3 @@ const proxyFetch = async (input: RequestInfo, init?: RequestInit): Promise<Respo
 }
 
 global.fetch = proxyFetch
-
-export {}
